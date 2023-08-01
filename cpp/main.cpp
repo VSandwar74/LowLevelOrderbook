@@ -5,10 +5,10 @@
 #include <unordered_map>
 #include <algorithm>
 #include "orderbook/orderbook.cpp" 
-# include "csv.h"
+#include "csv.h"
 
 struct DataFrameRow {
-    std::string Tick;
+    std::stringw Tick;
     std::string Ask;
     std::string AV;
     std::string Bid;
