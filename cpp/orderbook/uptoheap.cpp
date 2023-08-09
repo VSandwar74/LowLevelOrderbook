@@ -164,6 +164,12 @@ class Heap {
         
         int peek(int i) {return heap[i]->val;}
         bool exists() {return (sizeof(heap)) ? true : false;}
+        int getMin(){ 
+            if(exists()) {
+                return heap.front()->val;
+            }
+            return -1;
+        }
 };
 
 class MinHeap: public Heap {
@@ -183,13 +189,6 @@ class MinHeap: public Heap {
     }
 public:
     int getSize() {return sizeof(heap);}
-
-    int getMin(){ 
-        if(exists()) {
-            return heap.front()->val;
-        }
-        return -1;
-    }
     
     void insert(DoublyLinkedList* k){
         heap.push_back(k);
@@ -256,13 +255,6 @@ class MaxHeap: public Heap {
     }
 public:
     int getSize() {return sizeof(heap);}
-
-    int getMin(){ 
-        if(exists()) {
-            return heap.front()->val;
-        }
-        return -1;
-    }
     
     void insert(DoublyLinkedList* k){
         heap.push_back(k);
