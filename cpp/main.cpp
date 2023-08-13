@@ -1,49 +1,89 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 #include "orderbook/uptoheap.cpp"
 
+using namespace std;
+
 int main() {
-    // Insert some elements into the heap
-    MaxHeap minHeap;
 
-    Order* o1 = new Order(1, 12345.6789, "Buy", 1010.0f, 10, "Client A");   
-    Order* o2 = new Order(2, 98765.4321, "Sell", 910.0f, 20, "Client B");
-    Order* o3 = new Order(3, 98765.4321, "Sell", 920.0f, 20, "Client B");
-    Order* o4 = new Order(4, 98765.4321, "Sell", 930.0f, 20, "Client B");
+    OrderBook book;
 
-    Node* n1 = new Node(o1);
-    Node* n2 = new Node(o2);
-    Node* n3 = new Node(o3);
-    Node* n6 = new Node(o4);
+    ifstream file;
+    file.open("/Users/VishakhS/QFS/CPPOrderbook/LOBSTER_SampleFile_AMZN_2012-06-21_1/AMZN_2012-06-21_34200000_57600000_message_1.csv");
 
-    DoublyLinkedList* node1 = new DoublyLinkedList(n1);
-    DoublyLinkedList* node2 = new DoublyLinkedList(n2);
-    DoublyLinkedList* node3 = new DoublyLinkedList(n3);
-    DoublyLinkedList* node4 = new DoublyLinkedList(n6);
+    // Parse Header; 
+    string line;
+    getline(file, line);
+    vector<string> row;
+    string cell;
+    for (char x:line) {
+        if (x == ',') {
+            row.push_back(cell);
+            cout << cell << endl;
+            cell = "";
+        } else {
+            cell += x;
+        }
+    }
+    row.push_back(cell);
+    cout << cell << endl;
+    cell = "";
 
-    minHeap.insert(node1);
-    minHeap.insert(node2);
-    minHeap.insert(node3);
-    minHeap.insert(node4);
+    while (getline(file, line)) {
+        // Parse rows
+        vector<string> row;
+        string cell;
+        for (char x:line) {
+            if (x == ',') {
+                row.push_back(cell);
+                cout << cell << " ";
+                cell = "";
+            } else {
+                cell += x;
+            }
+        }
+        row.push_back(cell);
+        cout << cell << endl;
+        cell = "";
 
-    cout << "Min element: " << minHeap.getMin() << endl;
-    cout << "Heap elements: ";
-    minHeap.printHeap();  // The elements may not be in sorted order after insertion
+        // Time,Type,OrderId,Size,Price,Direction
+        double time = stod(row[0]);
+        int type = stoi(row[1]);
+        int orderid = stoi(row[2]);
+        int lotsize = stoi(row[3]);
+        double price = stoi(row[4]);
+        int direction = stoi(row[5]);
+        price /= 1000;
 
-    // Remove the minimum element
-    minHeap.popOrder();
-    cout << "After popping the minimum element: ";
-    minHeap.printHeap();  // The heap will be restructured after the pop
+        Order curr(orderid, time, (direction == 1) ? "BID" : "ASK", price, lotsize, "client");
+        switch (type) {
+            case 1:
+                book.placeOrder(curr);
+                break;
+            case 2:
+                book.partialCancel(orderid, lotsize);
+                break;
+            case 3:
+                book.cancelOrder(orderid);
+                break;
+            case 4:
+                book.executeOrder(orderid, "market");
+                break;
+            case 5:
+                // hidden execute
+                break;
+            case 7:
+                // halts
+                break;
+            default:
+                break;
+        }
 
-    // Remove a specific element
-    minHeap.remove(node2);
-    cout << "After removing node2: ";
-    minHeap.printHeap();
+    }
 
-    // Clean up memory
-    // delete node1;
-    // delete node2;
-    // delete node3;
-    // delete node4;
-
+    file.close();
     return 0;
 }

@@ -8,7 +8,7 @@
 #include "csv.h"
 
 struct DataFrameRow {
-    std::stringw Tick;
+    std::string Tick;
     std::string Ask;
     std::string AV;
     std::string Bid;
