@@ -3,9 +3,27 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "orderbook/uptoheap.cpp"
+#include "orderbook/orderbook.cpp"
 
 using namespace std;
+
+// int main() {
+
+//     OrderBook orderBook;
+
+//     Order bidOrder(1, 12345.6789, "BID", 1000.0, 10, "Client A");
+//     Order askOrder(2, 12346.7890, "ASK", 1010.0, 8, "Client B");
+
+//     cout << askOrder.datetime << "\n";
+
+//     orderBook.placeOrder(bidOrder);
+//     orderBook.placeOrder(askOrder);
+
+//     // Check if trades have occurred and holdings have been updated accordingly
+//     assert(orderBook.getVolumeAtPrice(1000, "BID") == 10);
+//     assert(orderBook.getVolumeAtPrice(1010, "ASK") == 8);
+
+// }
 
 int main() {
 
@@ -22,15 +40,19 @@ int main() {
     for (char x:line) {
         if (x == ',') {
             row.push_back(cell);
-            cout << cell << endl;
+            // cout << cell << endl;
             cell = "";
         } else {
             cell += x;
         }
     }
     row.push_back(cell);
-    cout << cell << endl;
+    // cout << cell << endl;
     cell = "";
+
+    cout << "header parsed" << "\n";
+
+    int a = 0;
 
     while (getline(file, line)) {
         // Parse rows
@@ -59,17 +81,28 @@ int main() {
         price /= 1000;
 
         Order curr(orderid, time, (direction == 1) ? "BID" : "ASK", price, lotsize, "client");
+
+        cout << "TRY " << a << "\n";
+        a += 1;
+        // cout << "made it" << "\n";
+
         switch (type) {
             case 1:
+                cout << "placed" << "\n";
                 book.placeOrder(curr);
+                book.printMap();
                 break;
             case 2:
+                cout << "part cancel" << "\n";
                 book.partialCancel(orderid, lotsize);
                 break;
             case 3:
+                cout << "full cancel" << "\n";
                 book.cancelOrder(orderid);
                 break;
             case 4:
+                cout << "exec" << "\n";
+                // book.printQueueMap();
                 book.executeOrder(orderid, "market");
                 break;
             case 5:
@@ -81,6 +114,7 @@ int main() {
             default:
                 break;
         }
+
 
     }
 
